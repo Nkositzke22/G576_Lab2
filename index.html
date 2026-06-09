@@ -1,31 +1,44 @@
-<!DOCTYPE html>                                                                                     <!--Sets document type-->
-<html lang="en">                                                                                    <!--Sets language to English-->
-<head>                                                                                              <!--Sets up the Head element-->
-  <title>Hello, Map!</title>                                                                        <!--Sets the internal map title-->
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />                             <!--Sets the viewport for responsive design-->
-  <meta name="description" content="" />
+<!DOCTYPE html>                                                                     <html lang="en">                                                                    <head>                                                                              <title>Hello, Map!</title>                                                        <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />              <meta name="description" content="" />
 
-  <!-- calls for the arcgis api's CSS file and JS library. -->
   <link rel="stylesheet" href="https://js.arcgis.com/4.25/esri/themes/light/main.css">
   <script src="https://js.arcgis.com/4.25/"></script>
 
-  <!-- Adding the modules, API key, and map constant needed for a full screen map app -->
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+
+</head>
+<body>
+
+  <div id="viewDiv"></div>
+
   <script>
   
     require([
      "esri/config",
       "esri/Map",
-      "esri/views/MapView"
-      <!--These two will give our web map the ability to work  with graphics-->
+      "esri/views/MapView",
+      // These two give our web map the ability to work with graphics
       "esri/Graphic",
-      "esri/layers/GraphicsLayer"
+      "esri/layers/GraphicsLayer",
 
-    ], function (esriConfig,Map, MapView, Graphic, GraphicsLayer) {
+      //addng in the module for the feature layers
+      "esri/layers/FeatureLayer"
 
-      esriConfig.apiKey = "AAPTau7l9zV1JqiD1DBhryF-CPg..ZLSOcbqgh0ONE2slQEiaTqrrUI9TlEQg-3ZfWtrR-Ur2oKQRwsv-KCdLKsARwQBmPGaG2FKABsW3UmmWIU-XJKOMLXRXHIwIGTZ-em8fZ6ln7jgXILnyk_sdiPEmyHHJ2R3aewVZeHoN_D5zBlUrSDh34lDuLWb8Pqkd_AZTEeTKoUFodKYWH-GFpwherADvTOzXsWe5qGAf9LXl64x-tfRA3Ohh_KUnBRvjZni6S_7xIgaT4DTFIQZ8DMMEk0vvSSN_JwLUAT1_WThHLKNd";
+    ], function (esriConfig,Map, MapView, Graphic, GraphicsLayer, FeatureLayer) {
+
+      //esriConfig.apiKey = "AAPTau7l9zV1JqiD1DBhryF-CPg..ZLSOcbqgh0ONE2slQEiaTqrrUI9TlEQg-3ZfWtrR-Ur2oKQRwsv-KCdLKsARwQBmPGaG2FKABsW3UmmWIU-XJKOMLXRXHIwIGTZ-em8fZ6ln7jgXILnyk_sdiPEmyHHJ2R3aewVZeHoN_D5zBlUrSDh34lDuLWb8Pqkd_AZTEeTKoUFodKYWH-GFpwherADvTOzXsWe5qGAf9LXl64x-tfRA3Ohh_KUnBRvjZni6S_7xIgaT4DTFIQZ8DMMEk0vvSSN_JwLUAT1_WThHLKNd";
       const map = new Map({
-        basemap: "arcgis-topographic" // Basemap layer
+        basemap: "streets"
+        //basemap: "arcgis-topographic" what I would use if my API key worked
       });
 
       const view = new MapView({
@@ -49,38 +62,128 @@
         //defining the maker style
         const simpleMarkerSymbol = {
           type: "simple-marker",
-          color: [0, 0, 139] 
+          style: "square",
+          color: [0, 0, 139], 
           outline: {
             color: [255, 255, 255],
             width: 2
           }
         };
 
+        //defining popup properties
+        const popupTemplate = {
+        title: "{Name}",
+        content: "{Description}"
+        }
+        const attributes = {
+          Name: "Stevie Ray Vaughan Statue",
+          Description: "A bronze sculpture of Stevie Ray Vaughan by Ralph Helmick"
+        }
+    
         //creating the point
         const pointGraphic = new Graphic({
           geometry: point,
-          symbol: simpleMarkerSymbol
-        })
+          symbol: simpleMarkerSymbol,
+
+          //adding popup properties
+          popupTemplate: popupTemplate,
+          attributes: attributes
+        });
+
+        //creating a polyline
+      const polyline = {
+        type: "polyline",
+        paths: [
+          [-164.090000, 59.940174],
+          [-164.090000, 59.950000]
+        ]
+      };
+
+      //define the line's style
+      const simpleLineSymbol = {
+        type: "simple-line",
+        color: [255, 0, 0],
+        width: 2
+      };
+
+      //Combine the style and symbol
+      const lineGraphic = new Graphic({
+        geometry: polyline,
+        symbol: simpleLineSymbol
+      });
+
+      //creating a polygon
+      const polygon = {
+        type: "polygon",
+        rings: [
+          [
+            [-164.083328, 59.940174],
+            [-164.050000, 59.950000],
+            [-164.083330, 59.960000],
+            [-164.083328, 59.940174]
+          ]
+        ]
+      };
+
+      //define the polygon's style
+      const simpleFillSymbol = {
+        type: "simple-fill",
+        color: [255, 255, 0],
+        outline: {
+          color: [255, 0, 0],
+          width: 2
+        }
+      };
+
+      //Combine the style and symbol
+      const polygonGraphic = new Graphic({
+        geometry: polygon,
+        symbol: simpleFillSymbol
+      });
+
+        // Explicitly push the graphic onto the map's graphics layer canvas
+        graphicsLayer.add(pointGraphic);
+        graphicsLayer.add(lineGraphic);
+        graphicsLayer.add(polygonGraphic);
+
+      //adding constructor for the  feature layer
+      const nativevillage = new FeatureLayer({
+        url: "https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/Alaska_Native_Village_Statistical_Areas_v1/FeatureServer/0",
+        apiKey: "", //Ignoring my broken API key right now
+        outFields: ["NAME", "BASENAME", "Shape__Area", "Shape__Length"],
+        popupTemplate: {
+          title: "{BASENAME}",
+          content: "{<b>Name:</b> {NAME}<br>"+
+          "<b>Base Name:</b> {BASENAME}<br>"+
+          "<b>Area:</b> {Shape__Area}<br>"+
+          "<b>Length:</b> {Shape__Length}"
+        }
+      });
+    
+            //setting up airport icon
+      const airportSymbol = {
+        "type": "simple",
+        "symbol": {
+          "type": "picture-marker",
+          "url": "https://github.com/Nkositzke22/G576_Lab2/blob/main/ac_unit_24dp_E3E3E3.png",
+          "width": "18px",
+          "height": "18px"
+        }
+      }
+      //Adding Airports layer for Challenge 4
+      const usAirports = new FeatureLayer({
+        url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/US_Airports_G576_Lab2/FeatureServer/0",
+        renderer: airportSymbol,
+        apiKey: "", 
+      });
+
+
+    
+      //addign feature layer to map
+      map.add(nativevillage);
+      map.add(usAirports);
     });
   </script>
-
-  <!-- css to make a full screen map -->
-  <style>
-    html,
-    body,
-    #viewDiv {
-      padding: 0;
-      margin: 0;
-      height: 100%;
-      width: 100%;
-    }
-  </style>
-
-</head>
-<body>
-
-  <!-- the div to displays the map  -->
-  <div id="viewDiv"></div>
 
 </body>
 </html>
