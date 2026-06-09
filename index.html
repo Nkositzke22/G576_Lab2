@@ -165,7 +165,7 @@
         "type": "simple",
         "symbol": {
           "type": "picture-marker",
-          "url": "ac_unit_24dp_E3E3E3.png",
+          "url": "local_airport_24dp_E3E3E3.png",
           "width": "18px",
           "height": "18px"
         }
@@ -186,11 +186,23 @@
           }
         },
 
+
         labelPlacement: "above-center",
         labelExpressionInfo: {
           expression: "$feature.Fac_Name"
         }
       };
+
+      //setting up helicopter icons
+            const heliportSymbol = {
+        "type": "simple",
+        "symbol": {
+          "type": "picture-marker",
+          "url": "ac_unit_24dp_E3E3E3.png",
+          "width": "18px",
+          "height": "18px"
+        }
+      }
 
       //Adding Airports layer for Challenge 4
       const usAirports = new FeatureLayer({
@@ -198,6 +210,15 @@
         renderer: airportSymbol,
         definitionExpression: "Fac_Type = 'AIRPORT'", //adding sql to filter for airports
         labelingInfo: [airportLabels], //adding labels
+        apiKey: "", 
+      });
+
+      //Adding Heliports layer for Challenge 4
+      const usHeliports = new FeatureLayer({
+        url: "https://services.arcgis.com/HRPe58bUyBqyyiCt/arcgis/rest/services/US_Airports_G576_Lab2/FeatureServer/0",
+        renderer: heliportSymbol,
+        definitionExpression: "Fac_Type = 'HELIPORT'", //adding sql to filter for heliports
+        labelingInfo: [heliportLabels], //adding labels
         apiKey: "", 
       });
 
